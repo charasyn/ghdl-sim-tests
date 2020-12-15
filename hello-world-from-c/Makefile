@@ -4,33 +4,30 @@ target := tb
 vhdl_src := cfuncs.vhd tb.vhd
 c_src := custom.c
 
-objdir := build
+workdir := obj/work
+c_objdir := obj/c
 
-obj := $(patsubst %.vhd,$(objdir)/%.o,$(vhdl_src))
-c_obj := $(patsubst %.c,$(objdir)/%.o,$(c_src))
+c_obj := $(patsubst %.c,$(c_objdir)/%.o,$(c_src))
 
-COMMA := ,
-GHDL := ghdl-gcc
-GHDL_ARGS := --workdir=$(objdir)
+comma := ,
+ghdl := ghdl-gcc
+ghdl_args := --workdir=$(workdir)
 
 all: $(target)
 
-$(target): $(c_obj) | $(objdir)
-	$(GHDL) -i $(GHDL_ARGS) $(vhdl_src)
-	$(GHDL) -e $(GHDL_ARGS) $(patsubst %,-Wl$(COMMA)%,$(c_obj)) $(target)
+$(target): $(c_obj) $(vhdl_src) | $(workdir)
+	$(ghdl) -i $(ghdl_args) $(vhdl_src)
+	$(ghdl) -m $(ghdl_args) $(patsubst %,-Wl$(comma)%,$(c_obj)) $(target)
 
-$(objdir)/%.o: %.c | $(objdir)
+$(c_objdir)/%.o: %.c | $(c_objdir)
 	gcc -Wall -Wextra -Werror -c -o $@ $<
 
-$(objdir)/%.o: %.vhd | $(objdir)
-	$(GHDL) -a $(GHDL_ARGS) $<
-
-$(objdir):
-	mkdir -p $(objdir)
+$(workdir) $(c_objdir):
+	mkdir -p $@
 
 clean:
 	rm -vf ./e~$(target).o $(target)
-	rm -rvf $(objdir)
+	rm -rvf $(workdir) $(c_objdir)
 
 test: $(target)
 	./$(target)

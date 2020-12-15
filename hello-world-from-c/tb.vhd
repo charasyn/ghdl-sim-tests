@@ -5,8 +5,7 @@ end tb;
 
 architecture arch of tb is
 begin
-  process
-  begin
+  process begin
     hello_world;
     wait;
   end process;
