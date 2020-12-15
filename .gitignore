@@ -1,3 +1,6 @@
+# Ignore whole obj/ directory
+obj/
+# To pick up e~tb.o
 *.o
-*.cf
+# Ignore any testbench executables
 tb
